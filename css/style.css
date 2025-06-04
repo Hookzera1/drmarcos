@@ -2006,44 +2006,54 @@ footer {
 .btn-whatsapp {
     background-color: #25d366;
     color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    transition: background-color 0.3s ease;
+    gap: 10px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2);
 }
 
 .btn-whatsapp:hover {
     background-color: #128c7e;
     color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+}
+
+.btn-whatsapp i {
+    font-size: 1.2em;
 }
 
 .status-badge {
     display: inline-flex;
     align-items: center;
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: 10px 20px;
+    border-radius: 25px;
     font-weight: 600;
-    font-size: 0.9rem;
     gap: 8px;
+    margin: 15px 0;
 }
 
 .status-badge.pending {
     background-color: #fff3cd;
     color: #856404;
+    border: 1px solid #ffeeba;
 }
 
 .status-badge.approved {
     background-color: #d4edda;
     color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
 .status-badge.cancelled {
     background-color: #f8d7da;
     color: #721c24;
+    border: 1px solid #f5c6cb;
 }
 
 @media (max-width: 768px) {
@@ -2130,41 +2140,42 @@ footer {
     }
 }
 
-/* Melhorias nos botões de ação */
-.appointment-actions {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 30px;
-}
-
-.btn-whatsapp {
-    background-color: #25d366;
-    color: #fff;
-    padding: 15px 30px;
-    border-radius: 30px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2);
-}
-
-.btn-whatsapp:hover {
-    background-color: #128c7e;
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
-}
-
-.btn-whatsapp i {
-    font-size: 1.2em;
-}
-
-/* Responsividade */
+/* Melhorias de acessibilidade para mobile */
 @media (max-width: 768px) {
+    .btn,
+    .nav-link,
+    .time-slot,
+    .calendar-day,
+    .menu-toggle,
+    input[type="submit"],
+    input[type="button"],
+    button {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 12px 20px;
+        touch-action: manipulation;
+    }
+    
+    .info-item a,
+    .footer-contact a {
+        padding: 5px 0;
+        display: inline-block;
+    }
+    
+    input,
+    select,
+    textarea {
+        font-size: 16px; /* Previne zoom automático no iOS */
+    }
+    
+    .time-slots {
+        gap: 10px;
+    }
+    
+    .calendar-grid {
+        gap: 5px;
+    }
+    
     .appointment-code strong {
         font-size: 1.5em;
         word-break: break-all;
@@ -2181,6 +2192,51 @@ footer {
     .btn-whatsapp {
         width: 100%;
         justify-content: center;
+    }
+    
+    .container {
+        padding: 0 15px;
+    }
+    
+    section {
+        padding: 40px 0;
+    }
+    
+    .contact-content .container {
+        flex-direction: column;
+        gap: 30px;
+    }
+    
+    .contact-info, 
+    .contact-form {
+        width: 100%;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .schedule-tabs {
+        padding: 10px 0;
+        margin-bottom: 20px;
+    }
+    
+    .appointment-details {
+        padding: 15px;
+    }
+    
+    .appointment-info {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .appointment-actions {
+        gap: 10px;
+    }
+    
+    .footer-content {
+        gap: 20px;
+        padding: 30px 0;
     }
 }
 
@@ -2279,14 +2335,44 @@ footer {
     font-size: 1.1em;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-    .cancellation-success {
-        padding: 20px;
+/* Responsividade para telas muito pequenas */
+@media (max-width: 360px) {
+    .hero h2 {
+        font-size: 1.8rem;
     }
     
-    .cancellation-icon i {
-        font-size: 3rem;
+    .hero p {
+        font-size: 1rem;
+    }
+    
+    .appointment-code strong {
+        font-size: 1.2em;
+        letter-spacing: 1px;
+    }
+    
+    .form-group label {
+        font-size: 0.9rem;
+    }
+    
+    .time-slots {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .info-item {
+        padding: 10px;
+    }
+    
+    .info-item h4 {
+        font-size: 1rem;
+    }
+    
+    .info-item p {
+        font-size: 0.9rem;
     }
     
     .appointment-cancelled-message {
