@@ -43,23 +43,25 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Inicializar Swiper para depoimentos
-    const testimonialSwiper = new Swiper('.testimonial-slider', {
-        slidesPerView: 1,
-        spaceBetween: 30,
-        loop: true,
-        autoplay: {
-            delay: 5000,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-    });
+    if (document.querySelector('.testimonial-slider')) {
+        const testimonialSwiper = new Swiper('.testimonial-slider', {
+            slidesPerView: 1,
+            spaceBetween: 30,
+            loop: true,
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+        });
+    }
 
     // Menu mobile toggle
     const menuToggle = document.querySelector('.menu-toggle');
@@ -72,9 +74,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Inicializar calendário
-    const calendarContainer = document.getElementById('appointment-calendar');
-    if (calendarContainer) {
+    // Inicializar calendário se estiver na página de contato
+    if (document.getElementById('appointment-calendar')) {
         initializeCalendar();
     }
 });
@@ -137,9 +138,9 @@ function renderCalendar(month, year) {
     
     let calendarHTML = `
         <div class="calendar-header">
-            <button class="calendar-nav" onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+            <button type="button" class="calendar-nav" onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
             <h4>${monthNames[month]} ${year}</h4>
-            <button class="calendar-nav" onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+            <button type="button" class="calendar-nav" onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
         </div>
         <div class="calendar-grid">
             <div class="calendar-day-name">Dom</div>
@@ -206,14 +207,22 @@ function selectDate(dateString) {
     today.setHours(0, 0, 0, 0);
     
     // Não permitir datas passadas
-    if (date < today) return;
+    if (date < today) {
+        showMessage('error', 'Não é possível selecionar datas passadas');
+        return;
+    }
     
     // Não permitir fins de semana
-    if (date.getDay() === 0 || date.getDay() === 6) return;
+    if (date.getDay() === 0 || date.getDay() === 6) {
+        showMessage('error', 'Não é possível agendar em finais de semana');
+        return;
+    }
     
     // Remover seleção anterior
     const selectedDay = document.querySelector('.calendar-day.selected');
-    if (selectedDay) selectedDay.classList.remove('selected');
+    if (selectedDay) {
+        selectedDay.classList.remove('selected');
+    }
     
     // Adicionar seleção atual
     const dayElement = document.querySelector(`[data-date="${dateString}"]`);
@@ -270,10 +279,16 @@ function generateTimeSlots(dateString) {
 // Função para selecionar um horário
 function selectTime(time) {
     const selectedDate = document.getElementById('meeting-date').value;
-    if (!selectedDate) return;
+    if (!selectedDate) {
+        showMessage('error', 'Por favor, selecione uma data primeiro');
+        return;
+    }
 
     // Verificar se o horário já está bloqueado
-    if (isTimeBlocked(selectedDate, time)) return;
+    if (isTimeBlocked(selectedDate, time)) {
+        showMessage('error', 'Este horário já está reservado');
+        return;
+    }
 
     // Remover seleção anterior
     const selectedSlot = document.querySelector('.time-slot.selected');
@@ -387,16 +402,18 @@ function showMessage(type, message) {
     messageContainer.textContent = message;
     
     const form = document.querySelector('#scheduleForm');
-    const existingMessage = form.querySelector('.message');
-    if (existingMessage) {
-        existingMessage.remove();
+    if (form) {
+        const existingMessage = form.querySelector('.message');
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+        
+        form.insertBefore(messageContainer, form.firstChild);
+        
+        setTimeout(() => {
+            messageContainer.remove();
+        }, 5000);
     }
-    
-    form.insertBefore(messageContainer, form.firstChild);
-    
-    setTimeout(() => {
-        messageContainer.remove();
-    }, 5000);
 }
 
 // Função para mostrar erro no campo

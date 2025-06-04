@@ -1964,3 +1964,333 @@ footer {
         width: 100%;
     }
 }
+
+/* Estilos para o resultado da consulta de agendamento */
+#appointment-result {
+    margin-top: 30px;
+    animation: fadeInUp 0.5s ease;
+}
+
+.appointment-details {
+    background: #fff;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.appointment-info {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.appointment-info p {
+    margin: 10px 0;
+    color: #666;
+    font-size: 1rem;
+}
+
+.appointment-info strong {
+    color: #333;
+    margin-right: 10px;
+}
+
+.appointment-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn-whatsapp {
+    background-color: #25d366;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-whatsapp:hover {
+    background-color: #128c7e;
+    color: #fff;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    gap: 8px;
+}
+
+.status-badge.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.approved {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-badge.cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+@media (max-width: 768px) {
+    .appointment-actions {
+        flex-direction: column;
+    }
+    
+    .appointment-actions button,
+    .appointment-actions a {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+/* Estilos para a tela de sucesso do agendamento */
+.success-icon {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.success-icon i {
+    font-size: 4rem;
+    color: #27ae60;
+    animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.appointment-message {
+    text-align: center;
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border-left: 4px solid #27ae60;
+}
+
+.appointment-message p {
+    margin: 5px 0;
+    color: #2e7d32;
+}
+
+.appointment-code {
+    text-align: center;
+    background: #e3f2fd;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 2px dashed #1976d2;
+}
+
+.appointment-code p {
+    color: #1565c0;
+    margin-bottom: 10px;
+}
+
+.appointment-code strong {
+    display: block;
+    font-size: 2em;
+    color: #1565c0;
+    letter-spacing: 2px;
+    font-family: monospace;
+    background: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 0.9;
+        transform: scale(1.1);
+    }
+    80% {
+        opacity: 1;
+        transform: scale(0.89);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Melhorias nos botões de ação */
+.appointment-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-whatsapp {
+    background-color: #25d366;
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2);
+}
+
+.btn-whatsapp:hover {
+    background-color: #128c7e;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+}
+
+.btn-whatsapp i {
+    font-size: 1.2em;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .appointment-code strong {
+        font-size: 1.5em;
+        word-break: break-all;
+    }
+    
+    .success-icon i {
+        font-size: 3rem;
+    }
+    
+    .appointment-actions {
+        flex-direction: column;
+    }
+    
+    .btn-whatsapp {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Estilos para mensagem de cancelamento */
+.appointment-cancelled-message {
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3545;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.appointment-cancelled-message i {
+    color: #dc3545;
+    font-size: 1.2em;
+}
+
+.appointment-cancelled-message p {
+    color: #721c24;
+    margin: 0;
+}
+
+/* Estilos para tela de sucesso do cancelamento */
+.cancellation-success {
+    text-align: center;
+    padding: 30px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    animation: fadeInUp 0.5s ease;
+}
+
+.cancellation-icon {
+    margin-bottom: 20px;
+}
+
+.cancellation-icon i {
+    font-size: 4rem;
+    color: #28a745;
+    animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.cancellation-success h4 {
+    color: #28a745;
+    margin-bottom: 15px;
+    font-size: 1.5em;
+}
+
+.cancellation-success p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.cancellation-success .btn {
+    margin-top: 15px;
+}
+
+/* Transições suaves */
+#appointment-result {
+    transition: opacity 0.3s ease;
+}
+
+/* Status badges melhorados */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.status-badge.pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.status-badge.approved {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-badge.cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-badge i {
+    font-size: 1.1em;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .cancellation-success {
+        padding: 20px;
+    }
+    
+    .cancellation-icon i {
+        font-size: 3rem;
+    }
+    
+    .appointment-cancelled-message {
+        flex-direction: column;
+        text-align: center;
+    }
+}

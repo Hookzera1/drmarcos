@@ -212,10 +212,7 @@ function handleSubmit(event) {
     }
     
     // Verificar se o horário ainda está disponível
-    const meetingDate = meetingDateInput.value;
-    const meetingTime = meetingTimeInput.value;
-    
-    if (isTimeBlocked(meetingDate, meetingTime)) {
+    if (isTimeBlocked(meetingDateInput.value, meetingTimeInput.value)) {
         showMessage('error', 'Este horário já foi reservado. Por favor, escolha outro horário.');
         return false;
     }
@@ -236,38 +233,87 @@ function handleSubmit(event) {
         createdAt: new Date().toISOString()
     };
     
-    // Salvar agendamento
-    saveAppointment(appointmentData);
-    
-    // Limpar tentativas após sucesso
-    attempts = 0;
-    
-    // Mostrar mensagem de sucesso com o código
-    showMessage('success', `Agendamento realizado com sucesso! Seu código é: ${appointmentData.code}`);
-    
-    // Limpar formulário
-    form.reset();
-    
-    // Atualizar visualização do calendário
-    const selectedDate = document.getElementById('meeting-date').value;
-    if (selectedDate) {
-        generateTimeSlots(selectedDate);
+    try {
+        // Salvar agendamento
+        saveAppointment(appointmentData);
+        
+        // Limpar tentativas após sucesso
+        attempts = 0;
+        
+        // Formatar data para exibição
+        const formattedDate = new Date(appointmentData.meetingDate).toLocaleDateString('pt-BR');
+        
+        // Criar container para os detalhes se não existir
+        let resultContainer = document.querySelector('#appointment-result');
+        if (!resultContainer) {
+            resultContainer = document.createElement('div');
+            resultContainer.id = 'appointment-result';
+            form.parentNode.insertBefore(resultContainer, form.nextSibling);
+        }
+        
+        // Limpar resultados anteriores
+        resultContainer.innerHTML = '';
+        
+        // Mostrar detalhes do agendamento
+        const appointmentDetails = document.createElement('div');
+        appointmentDetails.className = 'appointment-details';
+        appointmentDetails.innerHTML = `
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h4>Agendamento Realizado com Sucesso!</h4>
+            <div class="status-badge pending">
+                <i class="fas fa-clock"></i>
+                <span>Aguardando Confirmação</span>
+            </div>
+            <div class="appointment-code">
+                <p>Guarde seu código de agendamento:</p>
+                <strong>${appointmentData.code}</strong>
+            </div>
+            <div class="appointment-info">
+                <p><strong>Nome:</strong> ${appointmentData.name}</p>
+                <p><strong>Data:</strong> ${formattedDate}</p>
+                <p><strong>Horário:</strong> ${appointmentData.meetingTime}</p>
+                <p><strong>Tipo:</strong> ${appointmentData.meetingType}</p>
+                <p><strong>Formato:</strong> ${appointmentData.format}</p>
+                ${appointmentData.notes ? `<p><strong>Observações:</strong> ${appointmentData.notes}</p>` : ''}
+            </div>
+            <div class="appointment-message">
+                <p>Seu agendamento foi recebido e está aguardando confirmação.</p>
+                <p>Em breve você receberá uma confirmação via WhatsApp.</p>
+            </div>
+            <div class="appointment-actions">
+                <a href="https://wa.me/5531992180253" target="_blank" class="btn btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> Contatar via WhatsApp
+                </a>
+            </div>
+        `;
+        
+        // Adicionar detalhes ao container
+        resultContainer.appendChild(appointmentDetails);
+        
+        // Esconder o formulário
+        form.style.display = 'none';
+        
+        // Redirecionar para WhatsApp
+        const whatsappMessage = encodeURIComponent(
+            `Olá Dr. Marcos! Acabei de fazer um agendamento pelo site.\n\n` +
+            `Código: ${appointmentData.code}\n` +
+            `Nome: ${appointmentData.name}\n` +
+            `Data: ${formattedDate}\n` +
+            `Horário: ${appointmentData.meetingTime}\n` +
+            `Tipo: ${appointmentData.meetingType}\n` +
+            `Formato: ${appointmentData.format}`
+        );
+        
+        window.open(`https://wa.me/5531992180253?text=${whatsappMessage}`, '_blank');
+        
+        return false;
+    } catch (error) {
+        console.error('Erro ao salvar agendamento:', error);
+        showMessage('error', 'Ocorreu um erro ao salvar o agendamento. Por favor, tente novamente.');
+        return false;
     }
-    
-    // Redirecionar para WhatsApp
-    const whatsappMessage = encodeURIComponent(
-        `Olá Dr. Marcos! Acabei de fazer um agendamento pelo site.\n\n` +
-        `Código: ${appointmentData.code}\n` +
-        `Nome: ${appointmentData.name}\n` +
-        `Data: ${appointmentData.meetingDate}\n` +
-        `Horário: ${appointmentData.meetingTime}\n` +
-        `Tipo: ${appointmentData.meetingType}\n` +
-        `Formato: ${appointmentData.format}`
-    );
-    
-    window.open(`https://wa.me/5531992180253?text=${whatsappMessage}`, '_blank');
-    
-    return false;
 }
 
 // Função para verificar número de tentativas
@@ -307,17 +353,25 @@ function showMessage(type, message) {
     messageContainer.className = `message message-${type}`;
     messageContainer.textContent = message;
     
-    const form = document.querySelector('#scheduleForm');
-    const existingMessage = form.querySelector('.message');
-    if (existingMessage) {
-        existingMessage.remove();
+    // Encontrar o formulário ativo
+    const activeTab = document.querySelector('.tab-content.active');
+    const form = activeTab.querySelector('form');
+    
+    if (form) {
+        // Remover mensagem anterior se existir
+        const existingMessage = activeTab.querySelector('.message');
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+        
+        // Inserir nova mensagem
+        form.insertBefore(messageContainer, form.firstChild);
+        
+        // Remover mensagem após 5 segundos
+        setTimeout(() => {
+            messageContainer.remove();
+        }, 5000);
     }
-    
-    form.insertBefore(messageContainer, form.firstChild);
-    
-    setTimeout(() => {
-        messageContainer.remove();
-    }, 5000);
 }
 
 // Função para consultar agendamento
@@ -328,7 +382,17 @@ function checkAppointment(event) {
     const emailInput = form.querySelector('#check-email');
     const codeInput = form.querySelector('#check-code');
     
-    if (!emailInput.value.trim() || !validateEmail(emailInput.value)) {
+    // Limpar mensagens de erro anteriores
+    removeFieldError(emailInput);
+    removeFieldError(codeInput);
+    
+    // Validar campos
+    if (!emailInput.value.trim()) {
+        showFieldError(emailInput, 'E-mail é obrigatório');
+        return false;
+    }
+    
+    if (!validateEmail(emailInput.value)) {
         showFieldError(emailInput, 'E-mail inválido');
         return false;
     }
@@ -338,70 +402,177 @@ function checkAppointment(event) {
         return false;
     }
     
-    const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-    const appointment = appointments.find(a => 
-        a.email === emailInput.value && 
-        a.code === codeInput.value
-    );
-    
-    if (!appointment) {
-        showMessage('error', 'Agendamento não encontrado');
+    try {
+        // Buscar agendamentos
+        const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+        const appointment = appointments.find(a => 
+            a.email.toLowerCase() === emailInput.value.toLowerCase() && 
+            a.code.toUpperCase() === codeInput.value.toUpperCase()
+        );
+        
+        if (!appointment) {
+            showMessage('error', 'Agendamento não encontrado. Verifique o e-mail e código informados.');
+            return false;
+        }
+        
+        // Formatar status para exibição
+        const statusMap = {
+            'pending': 'Pendente',
+            'approved': 'Aprovado',
+            'cancelled': 'Cancelado'
+        };
+
+        const statusIconMap = {
+            'pending': 'clock',
+            'approved': 'check',
+            'cancelled': 'times'
+        };
+
+        const statusColorMap = {
+            'pending': '#856404',
+            'approved': '#155724',
+            'cancelled': '#721c24'
+        };
+        
+        // Formatar data para exibição
+        const formattedDate = new Date(appointment.meetingDate).toLocaleDateString('pt-BR');
+        
+        // Criar container para os detalhes se não existir
+        let resultContainer = document.querySelector('#appointment-result');
+        if (!resultContainer) {
+            resultContainer = document.createElement('div');
+            resultContainer.id = 'appointment-result';
+            form.parentNode.insertBefore(resultContainer, form.nextSibling);
+        }
+        
+        // Limpar resultados anteriores
+        resultContainer.innerHTML = '';
+        
+        // Mostrar detalhes do agendamento
+        const appointmentDetails = document.createElement('div');
+        appointmentDetails.className = 'appointment-details';
+        appointmentDetails.innerHTML = `
+            <h4>Detalhes do Agendamento</h4>
+            <div class="status-badge ${appointment.status}">
+                <i class="fas fa-${statusIconMap[appointment.status]}"></i>
+                <span>${statusMap[appointment.status]}</span>
+            </div>
+            <div class="appointment-code">
+                <p>Código do agendamento:</p>
+                <strong>${appointment.code}</strong>
+            </div>
+            <div class="appointment-info">
+                <p><strong>Nome:</strong> ${appointment.name}</p>
+                <p><strong>Data:</strong> ${formattedDate}</p>
+                <p><strong>Horário:</strong> ${appointment.meetingTime}</p>
+                <p><strong>Tipo:</strong> ${appointment.meetingType}</p>
+                <p><strong>Formato:</strong> ${appointment.format}</p>
+                ${appointment.notes ? `<p><strong>Observações:</strong> ${appointment.notes}</p>` : ''}
+                <p><strong>Agendado em:</strong> ${new Date(appointment.createdAt).toLocaleString('pt-BR')}</p>
+            </div>
+            ${appointment.status !== 'cancelled' ? `
+                <div class="appointment-actions">
+                    <button type="button" class="btn btn-danger" onclick="handleCancelAppointment('${appointment.code}')">
+                        <i class="fas fa-times"></i> Cancelar Agendamento
+                    </button>
+                    <a href="https://wa.me/5531992180253" target="_blank" class="btn btn-whatsapp">
+                        <i class="fab fa-whatsapp"></i> Contatar via WhatsApp
+                    </a>
+                </div>
+            ` : `
+                <div class="appointment-cancelled-message">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Este agendamento foi cancelado em ${new Date(appointment.cancelledAt || appointment.updatedAt || appointment.createdAt).toLocaleString('pt-BR')}</p>
+                </div>
+            `}
+        `;
+        
+        // Adicionar detalhes ao container
+        resultContainer.appendChild(appointmentDetails);
+        
+        // Esconder o formulário após sucesso
+        form.style.display = 'none';
+        
+        return false;
+    } catch (error) {
+        console.error('Erro ao consultar agendamento:', error);
+        showMessage('error', 'Ocorreu um erro ao consultar o agendamento. Por favor, tente novamente.');
         return false;
     }
-    
-    // Mostrar detalhes do agendamento
-    const appointmentDetails = document.createElement('div');
-    appointmentDetails.className = 'appointment-details';
-    appointmentDetails.innerHTML = `
-        <h4>Detalhes do Agendamento</h4>
-        <div class="status-badge ${appointment.status}">
-            <i class="fas fa-clock"></i>
-            <span>${appointment.status === 'pending' ? 'Pendente' : 
-                   appointment.status === 'approved' ? 'Aprovado' : 'Cancelado'}</span>
-        </div>
-        <div class="appointment-info">
-            <p><strong>Nome:</strong> ${appointment.name}</p>
-            <p><strong>Data:</strong> ${new Date(appointment.meetingDate).toLocaleDateString('pt-BR')}</p>
-            <p><strong>Horário:</strong> ${appointment.meetingTime}</p>
-            <p><strong>Tipo:</strong> ${appointment.meetingType}</p>
-            <p><strong>Formato:</strong> ${appointment.format}</p>
-        </div>
-        ${appointment.status !== 'cancelled' ? `
-            <button class="btn btn-danger" onclick="handleCancelAppointment('${appointment.code}')">
-                Cancelar Agendamento
-            </button>
-        ` : ''}
-    `;
-    
-    const resultContainer = document.querySelector('#check-appointment');
-    const existingDetails = resultContainer.querySelector('.appointment-details');
-    if (existingDetails) {
-        existingDetails.remove();
-    }
-    
-    form.appendChild(appointmentDetails);
-    
-    return false;
 }
 
 // Função para lidar com o cancelamento de agendamento
 function handleCancelAppointment(code) {
-    if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
-        if (cancelAppointment(code)) {
-            showMessage('success', 'Agendamento cancelado com sucesso!');
-            // Recarregar os detalhes do agendamento
-            const checkForm = document.querySelector('#checkAppointmentForm');
-            if (checkForm) {
-                checkAppointment.call(checkForm, { preventDefault: () => {} });
+    if (!code) {
+        showMessage('error', 'Código de agendamento inválido');
+        return;
+    }
+
+    if (confirm('Tem certeza que deseja cancelar este agendamento? Esta ação não pode ser desfeita.')) {
+        try {
+            const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+            const appointmentIndex = appointments.findIndex(a => a.code === code);
+            
+            if (appointmentIndex === -1) {
+                showMessage('error', 'Agendamento não encontrado');
+                return;
             }
-            // Atualizar visualização do calendário se estiver visível
-            const selectedDate = document.getElementById('meeting-date').value;
-            if (selectedDate) {
-                generateTimeSlots(selectedDate);
+            
+            // Atualizar status e adicionar data de cancelamento
+            const appointment = appointments[appointmentIndex];
+            appointment.status = 'cancelled';
+            appointment.cancelledAt = new Date().toISOString();
+            appointments[appointmentIndex] = appointment;
+            
+            // Remover bloqueio do horário
+            removeBlockedTime(appointment.meetingDate, appointment.meetingTime);
+            
+            // Salvar alterações
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+            
+            // Mostrar mensagem de sucesso com animação
+            const resultContainer = document.querySelector('#appointment-result');
+            if (resultContainer) {
+                const successMessage = document.createElement('div');
+                successMessage.className = 'cancellation-success';
+                successMessage.innerHTML = `
+                    <div class="cancellation-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4>Agendamento Cancelado</h4>
+                    <p>O agendamento foi cancelado com sucesso.</p>
+                    <button type="button" class="btn btn-outline" onclick="resetConsultaForm()">
+                        <i class="fas fa-search"></i> Consultar outro agendamento
+                    </button>
+                `;
+                
+                // Substituir conteúdo atual com animação
+                resultContainer.style.opacity = '0';
+                setTimeout(() => {
+                    resultContainer.innerHTML = '';
+                    resultContainer.appendChild(successMessage);
+                    resultContainer.style.opacity = '1';
+                }, 300);
             }
-        } else {
-            showMessage('error', 'Não foi possível cancelar o agendamento');
+        } catch (error) {
+            console.error('Erro ao cancelar agendamento:', error);
+            showMessage('error', 'Ocorreu um erro ao cancelar o agendamento. Por favor, tente novamente.');
         }
+    }
+}
+
+// Função para resetar o formulário de consulta
+function resetConsultaForm() {
+    const checkForm = document.querySelector('#checkAppointmentForm');
+    const resultContainer = document.querySelector('#appointment-result');
+    
+    if (checkForm) {
+        checkForm.reset();
+        checkForm.style.display = 'block';
+    }
+    
+    if (resultContainer) {
+        resultContainer.innerHTML = '';
     }
 }
 
