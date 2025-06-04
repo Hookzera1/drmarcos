@@ -24,7 +24,7 @@
                 <ul>
                     <li><a href="index.html" class="nav-link"><i class="fas fa-home"></i> <span>Início</span></a></li>
                     <li><a href="sobre.html" class="nav-link"><i class="fas fa-user-tie"></i> <span>Sobre</span></a></li>
-                    <li><a href="contato.html" class="nav-link nav-btn active"><i class="fas fa-envelope"></i> <span>Contato</span></a></li>
+                    <li><a href="contato.html" class="nav-link nav-btn active"><i class="fas fa-calendar-alt"></i> <span>Agendar</span></a></li>
                 </ul>
             </nav>
         </div>
@@ -32,7 +32,7 @@
 
     <section class="contact-hero">
         <div class="container">
-            <h2>Entre em Contato</h2>
+            <h2>Agende uma Consulta</h2>
             <p>Estamos prontos para ajudar você com suas questões jurídicas</p>
         </div>
     </section>
@@ -72,65 +72,110 @@
             </div>
 
             <div class="contact-form" data-aos="fade-left">
-                <h3>Agende uma Consulta</h3>
-                <form id="appointmentForm" onsubmit="return handleSubmit(event)">
-                    <div class="form-group">
-                        <label for="name">Nome Completo*</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="cpf">CPF*</label>
-                        <input type="text" id="cpf" name="cpf" required>
-                    </div>
+                <h3>Agende uma Reunião</h3>
+                <div class="schedule-tabs">
+                    <button class="schedule-tab active" data-tab="new-appointment">Nova Consulta</button>
+                    <button class="schedule-tab" data-tab="check-appointment">Consultar Agendamento</button>
+                </div>
+                
+                <div class="tab-content active" id="new-appointment">
+                    <form id="scheduleForm" onsubmit="return handleSubmit(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Nome Completo</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">E-mail</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="email">E-mail*</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">Telefone</label>
+                                <input type="tel" id="phone" name="phone" required placeholder="(00) 00000-0000">
+                            </div>
+                            <div class="form-group">
+                                <label for="document">CPF</label>
+                                <input type="text" id="document" name="document" placeholder="000.000.000-00">
+                            </div>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="phone">Telefone/WhatsApp*</label>
-                        <input type="tel" id="phone" name="phone" required>
-                    </div>
+                        <div class="form-group">
+                            <label for="meeting-type">Tipo de Reunião</label>
+                            <select id="meeting-type" name="meeting-type" required>
+                                <option value="">Selecione o tipo de reunião</option>
+                                <option value="primeira-consulta">Primeira Consulta</option>
+                                <option value="acompanhamento">Acompanhamento de Processo</option>
+                                <option value="contrato">Assinatura de Contrato</option>
+                                <option value="outro">Outro Assunto</option>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="subject">Assunto*</label>
-                        <select id="subject" name="subject" required>
-                            <option value="">Selecione o assunto</option>
-                            <option value="civil">Direito Civil</option>
-                            <option value="trabalho">Direito do Trabalho</option>
-                            <option value="previdenciario">Direito Previdenciário</option>
-                            <option value="outro">Outro</option>
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label>Formato da Reunião</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="format" value="presencial" checked> Presencial
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="format" value="online"> Online
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group calendar-container">
+                            <label>Selecione uma Data</label>
+                            <div id="appointment-calendar"></div>
+                            <div class="selected-date-display">Data selecionada: <span id="selected-date">Nenhuma</span></div>
+                            <input type="hidden" id="meeting-date" name="meeting-date" required>
+                        </div>
+                        
+                        <div class="form-group time-slots-container">
+                            <label>Horários Disponíveis</label>
+                            <div id="time-slots" class="time-slots">
+                                <p class="select-date-message">Selecione uma data para ver os horários disponíveis</p>
+                            </div>
+                            <input type="hidden" id="meeting-time" name="meeting-time" required>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="message">Mensagem*</label>
-                        <textarea id="message" name="message" required></textarea>
-                    </div>
+                        <div class="form-group">
+                            <label for="notes">Observações</label>
+                            <textarea id="notes" name="notes" rows="3" placeholder="Informe brevemente o assunto a ser tratado"></textarea>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="preferredDate">Data Preferencial</label>
-                        <input type="date" id="preferredDate" name="preferredDate">
-                    </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" id="reset-form">Limpar</button>
+                            <button type="submit" class="btn">Agendar Reunião</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="tab-content" id="check-appointment">
+                    <form id="checkAppointmentForm">
+                        <div class="form-group">
+                            <label for="check-email">E-mail utilizado no agendamento</label>
+                            <input type="email" id="check-email" name="check-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="check-code">Código de confirmação</label>
+                            <input type="text" id="check-code" name="check-code" required placeholder="Código recebido no agendamento">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn">Verificar Agendamento</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                    <div class="form-group">
-                        <label for="preferredTime">Horário Preferencial</label>
-                        <select id="preferredTime" name="preferredTime">
-                            <option value="">Selecione o horário</option>
-                            <option value="09:00">09:00</option>
-                            <option value="10:00">10:00</option>
-                            <option value="11:00">11:00</option>
-                            <option value="14:00">14:00</option>
-                            <option value="15:00">15:00</option>
-                            <option value="16:00">16:00</option>
-                            <option value="17:00">17:00</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="btn">Enviar Mensagem</button>
-                </form>
+    <section class="map">
+        <div class="container">
+            <h3>Localização</h3>
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3751.2034247287607!2d-43.94145232378894!3d-19.92299098660717!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xa699dc57d728d5%3A0x7ce2c39b7429a096!2sRua%20Curitiba%2C%20815%20-%20Centro%2C%20Belo%20Horizonte%20-%20MG!5e0!3m2!1spt-BR!2sbr!4v1689878456789!5m2!1spt-BR!2sbr" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </section>
@@ -145,7 +190,7 @@
                 </div>
                 <div class="footer-contact">
                     <h4>Contato</h4>
-                    <p><i class="fas fa-map-marker-alt"></i> Rua Curitiba,815,Sala 704,Centro</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Rua Curitiba, 815, Sala 704, Centro</p>
                     <p><i class="fas fa-phone"></i> (31) 99218-0253</p>
                     <p><i class="fas fa-envelope"></i> marcos.advcarvalhoreis@yahoo.com.br</p>
                 </div>      

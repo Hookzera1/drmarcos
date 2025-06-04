@@ -388,6 +388,121 @@ nav ul li:last-child {
     color: #2c3e50;
 }
 
+/* Seção de Estatísticas */
+.stats-section {
+    padding: 80px 0;
+    background-color: #f8f9fa;
+    text-align: center;
+}
+
+.stats-section h2 {
+    color: #1a5276;
+    margin-bottom: 50px;
+    font-size: 2.2rem;
+    position: relative;
+    display: inline-block;
+}
+
+.stats-section h2::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #1a5276, #3498db);
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.stat-item {
+    flex: 1;
+    min-width: 200px;
+    padding: 30px 20px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(26,82,118,0.1) 0%, rgba(52,152,219,0.1) 100%);
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 1;
+}
+
+.stat-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stat-item:hover::before {
+    transform: translateY(0);
+}
+
+.counter {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #1a5276;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 2;
+}
+
+.counter::after {
+    content: '+';
+    font-size: 2rem;
+    position: absolute;
+    top: 0;
+    right: -20px;
+    color: #3498db;
+}
+
+.stat-title {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    font-weight: 500;
+    position: relative;
+    z-index: 2;
+}
+
+@media (max-width: 768px) {
+    .stats-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-item {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .counter {
+        font-size: 3rem;
+    }
+
+    .stat-title {
+        font-size: 1rem;
+    }
+}
+
 /* Areas Section */
 .areas {
     padding: 80px 0;
@@ -1413,532 +1528,64 @@ footer {
 
 /* Decoração para o formulário */
 .contact-form {
-    position: relative;
-    z-index: 1;
-}
-
-.contact-form::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, rgba(26,82,118,0.1) 0%, rgba(52,152,219,0.1) 100%);
-    border-radius: 50%;
-    z-index: -1;
-    animation: pulse 4s infinite;
-}
-
-.contact-form::after {
-    content: '';
-    position: absolute;
-    bottom: -30px;
-    left: -30px;
-    width: 150px;
-    height: 150px;
-    background: linear-gradient(135deg, rgba(26,82,118,0.05) 0%, rgba(52,152,219,0.05) 100%);
-    border-radius: 50%;
-    z-index: -1;
-    animation: pulse 4s infinite 2s;
-}
-
-/* Indicador de carregamento estilizado */
-.loading-indicator {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(26,82,118,0.3);
-    border-radius: 50%;
-    border-top-color: #1a5276;
-    animation: spin 1s ease-in-out infinite;
-    margin-right: 10px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* Efeito de destaque para campos obrigatórios */
-.form-group.required label::after {
-    content: '*';
-    color: #e74c3c;
-    margin-left: 5px;
-}
-
-/* Estilo para o botão de envio quando desabilitado */
-button[type="submit"]:disabled {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
-}
-
-button[type="submit"]:disabled::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, 
-        rgba(255,255,255,0) 0%, 
-        rgba(255,255,255,0.2) 50%, 
-        rgba(255,255,255,0) 100%);
-    animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-    100% { left: 100%; }
-}
-
-/* Estilos para a mensagem de confirmação de agendamento */
-.appointment-confirmation {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 30px;
-    background: #fff;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    position: relative;
-}
-
-.appointment-confirmation h3 {
-    color: #1a5276;
-    text-align: center;
-    font-size: 1.8em;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e9f7fe;
-    position: relative;
-}
-
-.appointment-confirmation h3::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100px;
-    height: 2px;
-    background: linear-gradient(90deg, #1a5276, #3498db);
-}
-
-.appointment-confirmation .appointment-details {
-    background: transparent;
-    box-shadow: none;
-    padding: 0;
-}
-
-.appointment-confirmation .success-icon {
-    width: 80px;
-    height: 80px;
-    background: #fff3cd;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    border: 3px solid #ffc107;
-}
-
-.appointment-confirmation .success-icon i {
-    font-size: 2.5em;
-    color: #ffc107;
-}
-
-.appointment-confirmation .status-badge {
-    margin: 20px auto;
-    display: inline-flex;
-    padding: 12px 25px;
-    font-size: 1.1em;
-}
-
-.appointment-confirmation .appointment-info {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 12px;
-    margin: 20px 0;
-    text-align: center;
-    border: 1px solid #e9ecef;
-}
-
-.appointment-confirmation .appointment-info p {
-    margin: 10px 0;
-    color: #666;
-}
-
-.appointment-confirmation .appointment-details-info {
-    background: #fff;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 25px;
-    margin: 30px 0;
-}
-
-.appointment-confirmation .appointment-details-info h5 {
-    color: #1a5276;
-    font-size: 1.3em;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e9f7fe;
-}
-
-.appointment-confirmation .appointment-details-info p {
-    display: flex;
-    align-items: center;
-    margin: 15px 0;
-    color: #2c3e50;
-}
-
-.appointment-confirmation .appointment-details-info i {
-    width: 25px;
-    color: #1a5276;
-    margin-right: 15px;
-}
-
-.appointment-confirmation .appointment-code {
-    background: linear-gradient(135deg, #f8f9fa, #e9f7fe);
-    padding: 25px;
-    border-radius: 12px;
-    margin: 30px 0;
-    text-align: center;
-    border: 2px dashed #3498db;
-}
-
-.appointment-confirmation .appointment-code p {
-    color: #666;
-    margin: 10px 0;
-}
-
-.appointment-confirmation .appointment-code strong {
-    display: block;
-    font-size: 2em;
-    color: #1a5276;
-    margin: 15px 0;
-    letter-spacing: 3px;
-    font-family: monospace;
-}
-
-.appointment-confirmation .appointment-actions {
-    margin-top: 30px;
-    text-align: center;
-}
-
-.appointment-confirmation .appointment-actions button {
-    min-width: 200px;
-    margin: 10px;
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-    .appointment-confirmation {
-        padding: 20px;
-        margin: 15px;
-    }
-    
-    .appointment-confirmation h3 {
-        font-size: 1.5em;
-    }
-    
-    .appointment-confirmation .success-icon {
-        width: 60px;
-        height: 60px;
-    }
-    
-    .appointment-confirmation .success-icon i {
-        font-size: 2em;
-    }
-    
-    .appointment-confirmation .appointment-code strong {
-        font-size: 1.5em;
-    }
-    
-    .appointment-confirmation .appointment-actions button {
-        width: 100%;
-        margin: 10px 0;
-    }
-}
-
-/* Estilos para o status do agendamento */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-weight: 600;
-    margin: 15px 0;
-    gap: 8px;
-}
-
-.status-badge.pending {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-}
-
-.status-badge.approved {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.status-badge.rejected {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.status-badge i {
-    font-size: 1.1em;
-}
-
-/* Melhorias no feedback visual de tentativas */
-.form-error.attempts {
-    background-color: #fff3cd;
-    color: #856404;
-    border-left-color: #ffeeba;
-}
-
-.form-error.blocked {
-    background-color: #f8d7da;
-    color: #721c24;
-    border-left-color: #f5c6cb;
-    animation: shake 0.5s ease-in-out;
-}
-
-/* Detalhes do agendamento aprimorados */
-.appointment-details-info {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    margin: 20px 0;
-    border: 1px solid #e9ecef;
-}
-
-.appointment-details-info p {
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.appointment-details-info i {
-    color: #1a5276;
-    width: 20px;
-    text-align: center;
-}
-
-/* Animações para status */
-@keyframes pendingPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-.status-badge.pending i {
-    animation: pendingPulse 1.5s infinite;
-}
-
-/* Estilos para links de ação */
-.action-links {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
-    justify-content: center;
-}
-
-.action-link {
-    padding: 10px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
     transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
-.action-link.approve {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+.contact-form:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-.action-link.reject {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.action-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-/* Contador de tentativas */
-.attempts-counter {
-    font-size: 0.9em;
-    color: #6c757d;
-    text-align: right;
-    margin-top: 5px;
-}
-
-.attempts-counter.warning {
-    color: #856404;
-}
-
-.attempts-counter.danger {
-    color: #721c24;
-}
-
-/* Estilos para mensagem de horários indisponíveis */
-.no-slots-message {
-    text-align: center;
-    padding: 30px;
-    background: #f8f9fa;
-    border-radius: 10px;
-    border: 1px dashed #dee2e6;
-    margin: 20px 0;
-}
-
-.no-slots-message i {
-    font-size: 2.5em;
-    color: #6c757d;
-    margin-bottom: 15px;
-}
-
-.no-slots-message p {
-    color: #6c757d;
-    margin: 5px 0;
-}
-
-/* Estilos para confirmação de horário selecionado */
-.time-confirmation {
-    margin-top: 20px;
-    padding: 15px;
-    background: #e9f7fe;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    animation: slideIn 0.3s ease-out;
-}
-
-.time-confirmation i {
-    color: #1a5276;
-    font-size: 1.2em;
-}
-
-.time-confirmation p {
-    color: #1a5276;
-    margin: 0;
-    font-weight: 500;
-}
-
-/* Melhorias no grid de horários */
-.time-slots-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-.time-period {
-    background: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.time-period h5 {
-    color: #1a5276;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e9f7fe;
-    font-size: 1.1em;
-}
-
-.slots-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
-}
-
-/* Animações */
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-    .slots-grid {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    }
-    
-    .time-slot {
-        padding: 10px;
-    }
-    
-    .time-confirmation {
-        flex-direction: column;
-        text-align: center;
-    }
-}
-
-/* Estilos para as abas de agendamento */
 .schedule-tabs {
     display: flex;
     gap: 10px;
     margin-bottom: 30px;
-    border-bottom: 2px solid #e9ecef;
-    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
 }
 
 .schedule-tab {
     background: none;
     border: none;
-    padding: 12px 25px;
+    padding: 10px 20px;
     font-size: 1rem;
     font-weight: 600;
-    color: #6c757d;
+    color: #666;
     cursor: pointer;
-    transition: all 0.3s ease;
     position: relative;
-    border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
 }
 
 .schedule-tab::after {
     content: '';
     position: absolute;
-    bottom: -12px;
+    bottom: -17px;
     left: 0;
     width: 100%;
     height: 3px;
-    background-color: transparent;
-    transition: all 0.3s ease;
+    background-color: #1a5276;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
 }
 
 .schedule-tab:hover {
     color: #1a5276;
-    background-color: rgba(26, 82, 118, 0.05);
 }
 
 .schedule-tab.active {
     color: #1a5276;
-    background-color: #e9f7fe;
 }
 
 .schedule-tab.active::after {
-    background-color: #1a5276;
+    transform: scaleX(1);
 }
 
-/* Conteúdo das abas */
 .tab-content {
     display: none;
     opacity: 0;
@@ -1952,228 +1599,292 @@ button[type="submit"]:disabled::before {
     transform: translateY(0);
 }
 
-/* Animação de transição entre abas */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
-.tab-content.active {
-    animation: fadeInUp 0.5s ease forwards;
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
 }
 
-/* Responsividade das abas */
-@media (max-width: 768px) {
-    .schedule-tabs {
-        flex-direction: column;
-        gap: 5px;
-        border-bottom: none;
-        padding-bottom: 0;
-    }
-
-    .schedule-tab {
-        width: 100%;
-        border-radius: 8px;
-        text-align: center;
-        padding: 15px;
-    }
-
-    .schedule-tab::after {
-        display: none;
-    }
-
-    .schedule-tab.active {
-        background-color: #1a5276;
-        color: #fff;
-    }
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
-/* Estilos para a tela de consulta de agendamento */
-.appointment-check-result {
-    background: #fff;
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    max-width: 800px;
-    margin: 0 auto;
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #333;
+    transition: all 0.3s ease;
+    background-color: #fff;
 }
 
-.check-header {
-    text-align: center;
-    margin-bottom: 25px;
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #1a5276;
+    box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+    outline: none;
 }
 
-.check-icon {
-    width: 80px;
-    height: 80px;
-    background: #e9f7fe;
-    border-radius: 50%;
+.form-group input.invalid,
+.form-group select.invalid,
+.form-group textarea.invalid {
+    border-color: #e74c3c;
+}
+
+.field-error {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: block;
+}
+
+.checkbox-group,
+.radio-group {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.checkbox-label,
+.radio-label {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    border: 3px solid #1a5276;
+    cursor: pointer;
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    background-color: #fff;
 }
 
-.check-icon i {
-    font-size: 2.5em;
-    color: #1a5276;
+.checkbox-label:hover,
+.radio-label:hover {
+    background-color: rgba(26, 82, 118, 0.05);
+    border-color: #1a5276;
 }
 
-.check-icon.canceled {
-    background: #fee9e9;
-    border-color: #dc3545;
+.checkbox-label input,
+.radio-label input {
+    margin-right: 8px;
 }
 
-.check-icon.canceled i {
-    color: #dc3545;
-}
-
-.check-header h4 {
-    color: #1a5276;
-    font-size: 1.8em;
-    margin: 0;
-}
-
-.check-details {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 25px;
-    margin: 25px 0;
-}
-
-.detail-item {
-    display: flex;
-    align-items: flex-start;
+.calendar-container {
     margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.detail-item:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-}
-
-.detail-item i {
-    color: #1a5276;
-    font-size: 1.2em;
-    width: 30px;
-    margin-right: 15px;
-    margin-top: 3px;
-}
-
-.detail-content {
-    flex: 1;
-}
-
-.detail-content label {
-    display: block;
-    color: #6c757d;
-    font-size: 0.9em;
-    margin-bottom: 3px;
-}
-
-.detail-content span {
-    color: #2c3e50;
-    font-weight: 500;
-}
-
-.check-code {
-    background: linear-gradient(135deg, #f8f9fa, #e9f7fe);
     padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    border: 2px dashed #1a5276;
-    margin: 25px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
 }
 
-.check-code label {
-    display: block;
-    color: #1a5276;
-    margin-bottom: 10px;
-    font-weight: 500;
+#appointment-calendar {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
 }
 
-.check-code strong {
-    display: block;
-    font-size: 2em;
-    color: #1a5276;
-    letter-spacing: 3px;
-    font-family: monospace;
-}
-
-.check-actions {
+.calendar-header {
     display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 30px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
 }
 
-.check-actions button {
-    min-width: 200px;
+.calendar-nav {
+    background: none;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    color: #1a5276;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
 }
 
-.btn-danger {
-    background-color: #dc3545;
-    border-color: #dc3545;
+.calendar-nav:hover {
+    color: #2980b9;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-day-name {
+    text-align: center;
+    font-weight: 600;
+    color: #666;
+    padding: 5px;
+}
+
+.calendar-day {
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.calendar-day:not(.empty):hover {
+    background-color: rgba(26, 82, 118, 0.1);
+}
+
+.calendar-day.selected {
+    background-color: #1a5276;
     color: #fff;
 }
 
-.btn-danger:hover {
-    background-color: #c82333;
-    border-color: #bd2130;
+.calendar-day.today {
+    border: 2px solid #1a5276;
 }
 
-.status-badge.canceled {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+.calendar-day.past {
+    color: #ccc;
+    cursor: not-allowed;
 }
 
-.cancel-message {
+.time-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.time-slot {
+    padding: 10px;
     text-align: center;
-    color: #6c757d;
-    margin: 20px 0;
-    line-height: 1.6;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.time-slot:hover {
+    background-color: rgba(26, 82, 118, 0.1);
+    border-color: #1a5276;
+}
+
+.time-slot.selected {
+    background-color: #1a5276;
+    color: #fff;
+    border-color: #1a5276;
+}
+
+.time-slot.unavailable {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    border-color: #ddd;
+}
+
+.select-date-message {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    font-style: italic;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.message {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.message-error {
+    background-color: #fdeaea;
+    color: #e74c3c;
+    border: 1px solid #f5b7b1;
+}
+
+.message-success {
+    background-color: #eafaf1;
+    color: #27ae60;
+    border: 1px solid #a9dfbf;
+}
+
+.message-warning {
+    background-color: #fef9e7;
+    color: #f1c40f;
+    border: 1px solid #f9e79f;
+}
+
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    animation: confetti-fall 3s linear forwards;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-100%) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
-    .appointment-check-result {
-        padding: 20px;
-        margin: 15px;
+    .form-row {
+        grid-template-columns: 1fr;
     }
 
-    .check-icon {
-        width: 60px;
-        height: 60px;
-    }
-
-    .check-icon i {
-        font-size: 2em;
-    }
-
-    .check-header h4 {
-        font-size: 1.5em;
-    }
-
-    .check-code strong {
-        font-size: 1.5em;
-    }
-
-    .check-actions {
+    .schedule-tabs {
         flex-direction: column;
     }
 
-    .check-actions button {
+    .schedule-tab {
+        width: 100%;
+        text-align: center;
+    }
+
+    .time-slots {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions button {
         width: 100%;
     }
 }
