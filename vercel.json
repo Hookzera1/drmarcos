@@ -18,7 +18,11 @@
   "routes": [
     {
       "src": "/css/(.*)",
-      "dest": "/css/$1"
+      "dest": "/css/$1",
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-type": "text/css"
+      }
     },
     {
       "src": "/js/(.*)",
