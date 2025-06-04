@@ -550,33 +550,109 @@ nav ul li:last-child {
 /* Testimonials Section */
 .testimonials {
     padding: 80px 0;
-    background-color: #1a5276;
+    background: linear-gradient(135deg, #1a5276 0%, #2980b9 100%);
     color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.testimonials::before {
+    content: '"';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 120px;
+    color: rgba(255, 255, 255, 0.1);
+    font-family: Georgia, serif;
 }
 
 .testimonials h2 {
     text-align: center;
     margin-bottom: 50px;
+    position: relative;
+    font-size: 2.2rem;
+}
+
+.testimonials h2::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .testimonial {
     max-width: 800px;
     margin: 0 auto;
     text-align: center;
-    padding: 30px;
+    padding: 40px;
     background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.testimonial:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
 }
 
 .testimonial p {
     font-size: 1.2rem;
     font-style: italic;
     margin-bottom: 20px;
+    line-height: 1.8;
+    position: relative;
+    z-index: 1;
 }
 
 .testimonial cite {
     font-weight: 600;
     font-style: normal;
+    display: block;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+}
+
+.swiper-pagination-bullet {
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+    background: #fff;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    color: #fff;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    .testimonial {
+        padding: 30px 20px;
+    }
+
+    .testimonial p {
+        font-size: 1.1rem;
+    }
+
+    .testimonial cite {
+        font-size: 1rem;
+    }
 }
 
 /* CTA Section */
