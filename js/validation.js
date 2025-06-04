@@ -94,9 +94,32 @@ function updateBlockMessage() {
 
 // Função para salvar agendamento no localStorage
 function saveAppointment(appointmentData) {
+    // Salvar o agendamento
     const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
     appointments.push(appointmentData);
     localStorage.setItem('appointments', JSON.stringify(appointments));
+
+    // Bloquear o horário
+    saveBlockedTime(appointmentData.meetingDate, appointmentData.meetingTime);
+}
+
+// Função para cancelar agendamento
+function cancelAppointment(code) {
+    const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+    const appointmentIndex = appointments.findIndex(a => a.code === code);
+    
+    if (appointmentIndex !== -1) {
+        const appointment = appointments[appointmentIndex];
+        // Remover o bloqueio do horário
+        removeBlockedTime(appointment.meetingDate, appointment.meetingTime);
+        
+        // Atualizar status do agendamento
+        appointment.status = 'cancelled';
+        appointments[appointmentIndex] = appointment;
+        localStorage.setItem('appointments', JSON.stringify(appointments));
+        return true;
+    }
+    return false;
 }
 
 // Função para gerar código único de agendamento
@@ -188,6 +211,15 @@ function handleSubmit(event) {
         return false;
     }
     
+    // Verificar se o horário ainda está disponível
+    const meetingDate = meetingDateInput.value;
+    const meetingTime = meetingTimeInput.value;
+    
+    if (isTimeBlocked(meetingDate, meetingTime)) {
+        showMessage('error', 'Este horário já foi reservado. Por favor, escolha outro horário.');
+        return false;
+    }
+
     // Se chegou aqui, o formulário é válido
     const appointmentData = {
         code: generateAppointmentCode(),
@@ -215,6 +247,12 @@ function handleSubmit(event) {
     
     // Limpar formulário
     form.reset();
+    
+    // Atualizar visualização do calendário
+    const selectedDate = document.getElementById('meeting-date').value;
+    if (selectedDate) {
+        generateTimeSlots(selectedDate);
+    }
     
     // Redirecionar para WhatsApp
     const whatsappMessage = encodeURIComponent(
@@ -323,11 +361,16 @@ function checkAppointment(event) {
         </div>
         <div class="appointment-info">
             <p><strong>Nome:</strong> ${appointment.name}</p>
-            <p><strong>Data:</strong> ${appointment.meetingDate}</p>
+            <p><strong>Data:</strong> ${new Date(appointment.meetingDate).toLocaleDateString('pt-BR')}</p>
             <p><strong>Horário:</strong> ${appointment.meetingTime}</p>
             <p><strong>Tipo:</strong> ${appointment.meetingType}</p>
             <p><strong>Formato:</strong> ${appointment.format}</p>
         </div>
+        ${appointment.status !== 'cancelled' ? `
+            <button class="btn btn-danger" onclick="handleCancelAppointment('${appointment.code}')">
+                Cancelar Agendamento
+            </button>
+        ` : ''}
     `;
     
     const resultContainer = document.querySelector('#check-appointment');
@@ -339,6 +382,27 @@ function checkAppointment(event) {
     form.appendChild(appointmentDetails);
     
     return false;
+}
+
+// Função para lidar com o cancelamento de agendamento
+function handleCancelAppointment(code) {
+    if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
+        if (cancelAppointment(code)) {
+            showMessage('success', 'Agendamento cancelado com sucesso!');
+            // Recarregar os detalhes do agendamento
+            const checkForm = document.querySelector('#checkAppointmentForm');
+            if (checkForm) {
+                checkAppointment.call(checkForm, { preventDefault: () => {} });
+            }
+            // Atualizar visualização do calendário se estiver visível
+            const selectedDate = document.getElementById('meeting-date').value;
+            if (selectedDate) {
+                generateTimeSlots(selectedDate);
+            }
+        } else {
+            showMessage('error', 'Não foi possível cancelar o agendamento');
+        }
+    }
 }
 
 // Inicializar eventos
