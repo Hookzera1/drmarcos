@@ -160,44 +160,36 @@ function renderCalendar(month, year) {
     // Dias do mês
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
+    
     for (let day = 1; day <= totalDays; day++) {
-        const date = new Date(year, month, day);
-        date.setHours(0, 0, 0, 0);
+        const currentDate = new Date(year, month, day);
+        const dateString = currentDate.toISOString().split('T')[0];
+        const isToday = currentDate.getTime() === today.getTime();
+        const isPast = currentDate < today;
+        const isWeekend = currentDate.getDay() === 0 || currentDate.getDay() === 6;
         
-        const isToday = date.getTime() === today.getTime();
-        const isPast = date < today;
-        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-        
-        let classes = 'calendar-day';
-        if (isToday) classes += ' today';
-        if (isPast) classes += ' past';
-        if (isWeekend) classes += ' weekend';
-        
-        const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        let classes = ['calendar-day'];
+        if (isToday) classes.push('today');
+        if (isPast || isWeekend) classes.push('past');
+        if (!isPast && !isWeekend) classes.push('available');
         
         calendarHTML += `
-            <div class="${classes}" data-date="${dateString}" onclick="selectDate('${dateString}')">
-                ${day}
-            </div>
+            <div class="${classes.join(' ')}" 
+                 data-date="${dateString}" 
+                 onclick="${!isPast && !isWeekend ? `selectDate('${dateString}')` : ''}">${day}</div>
         `;
+    }
+    
+    // Dias vazios no final do mês
+    const endDay = (startDay + totalDays) % 7;
+    if (endDay > 0) {
+        for (let i = endDay; i < 7; i++) {
+            calendarHTML += '<div class="calendar-day empty"></div>';
+        }
     }
     
     calendarHTML += '</div>';
     calendarContainer.innerHTML = calendarHTML;
-
-    // Restaurar data selecionada se houver
-    const selectedDate = document.getElementById('meeting-date').value;
-    if (selectedDate) {
-        const [selYear, selMonth, selDay] = selectedDate.split('-');
-        if (parseInt(selYear) === year && parseInt(selMonth) === month + 1) {
-            const dayElement = document.querySelector(`[data-date="${selectedDate}"]`);
-            if (dayElement) {
-                dayElement.classList.add('selected');
-                generateTimeSlots(selectedDate);
-            }
-        }
-    }
 }
 
 // Função para selecionar uma data
@@ -242,64 +234,45 @@ function selectDate(dateString) {
 function generateTimeSlots(dateString) {
     const timeSlotsContainer = document.getElementById('time-slots');
     if (!timeSlotsContainer) return;
-
-    // Horários disponíveis (9h às 18h, intervalo de 1h)
-    const availableSlots = [];
-    for (let hour = 9; hour < 18; hour++) {
-        // Intervalo para almoço (12h às 14h)
-        if (hour !== 12 && hour !== 13) {
-            availableSlots.push(`${hour.toString().padStart(2, '0')}:00`);
-        }
-    }
+    
+    const timeSlots = [
+        '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+        '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
+    ];
     
     let slotsHTML = '';
-    availableSlots.forEach(time => {
-        const isBlocked = isTimeBlocked(dateString, time);
-        const slotClass = `time-slot${isBlocked ? ' unavailable' : ''}`;
+    
+    // Verificar horários bloqueados
+    const blockedTimes = JSON.parse(localStorage.getItem('blockedTimes') || '{}');
+    const dateBlockedTimes = blockedTimes[dateString] || [];
+    
+    timeSlots.forEach(time => {
+        const isBlocked = dateBlockedTimes.includes(time);
+        const classes = ['time-slot'];
+        if (isBlocked) classes.push('unavailable');
         
         slotsHTML += `
-            <div class="${slotClass}" data-time="${time}" onclick="${isBlocked ? '' : `selectTime('${time}')`}">
-                ${time}
-            </div>
+            <div class="${classes.join(' ')}"
+                 data-time="${time}"
+                 onclick="${!isBlocked ? `selectTime('${time}')` : ''}">${time}</div>
         `;
     });
     
     timeSlotsContainer.innerHTML = slotsHTML;
-
-    // Restaurar horário selecionado se houver
-    const selectedTime = document.getElementById('meeting-time').value;
-    if (selectedTime) {
-        const timeElement = document.querySelector(`[data-time="${selectedTime}"]`);
-        if (timeElement && !timeElement.classList.contains('unavailable')) {
-            timeElement.classList.add('selected');
-        }
-    }
 }
 
 // Função para selecionar um horário
 function selectTime(time) {
-    const selectedDate = document.getElementById('meeting-date').value;
-    if (!selectedDate) {
-        showMessage('error', 'Por favor, selecione uma data primeiro');
-        return;
-    }
-
-    // Verificar se o horário já está bloqueado
-    if (isTimeBlocked(selectedDate, time)) {
-        showMessage('error', 'Este horário já está reservado');
-        return;
-    }
-
     // Remover seleção anterior
     const selectedSlot = document.querySelector('.time-slot.selected');
     if (selectedSlot) {
         selectedSlot.classList.remove('selected');
     }
     
-    // Adicionar seleção atual
-    const timeElement = document.querySelector(`[data-time="${time}"]`);
-    if (timeElement) {
-        timeElement.classList.add('selected');
+    // Adicionar nova seleção
+    const timeSlot = document.querySelector(`.time-slot[data-time="${time}"]`);
+    if (timeSlot) {
+        timeSlot.classList.add('selected');
     }
     
     // Atualizar campo oculto
@@ -308,22 +281,14 @@ function selectTime(time) {
 
 // Função para mudar o mês
 function changeMonth(delta) {
-    const currentDate = document.querySelector('.calendar-header h4').textContent;
-    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                       'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-    
-    const [month, year] = currentDate.split(' ');
-    let currentMonth = monthNames.indexOf(month);
-    let currentYear = parseInt(year);
-    
     currentMonth += delta;
     
-    if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-    } else if (currentMonth < 0) {
+    if (currentMonth < 0) {
         currentMonth = 11;
         currentYear--;
+    } else if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
     }
     
     renderCalendar(currentMonth, currentYear);
@@ -490,5 +455,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const checkForm = document.querySelector('#checkAppointmentForm');
     if (checkForm) {
         checkForm.addEventListener('submit', checkAppointment);
+    }
+});
+
+// Inicializar calendário quando o DOM estiver pronto
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+
+document.addEventListener('DOMContentLoaded', function() {
+    renderCalendar(currentMonth, currentYear);
+    
+    // Resetar formulário
+    const resetButton = document.getElementById('reset-form');
+    if (resetButton) {
+        resetButton.addEventListener('click', function() {
+            const form = document.getElementById('scheduleForm');
+            if (form) {
+                form.reset();
+                
+                // Limpar seleções do calendário
+                const selectedDay = document.querySelector('.calendar-day.selected');
+                if (selectedDay) {
+                    selectedDay.classList.remove('selected');
+                }
+                
+                // Resetar display de data
+                document.getElementById('selected-date').textContent = 'Nenhuma';
+                document.getElementById('meeting-date').value = '';
+                
+                // Limpar horários
+                const timeSlotsContainer = document.getElementById('time-slots');
+                if (timeSlotsContainer) {
+                    timeSlotsContainer.innerHTML = '<p class="select-date-message">Selecione uma data para ver os horários disponíveis</p>';
+                }
+                document.getElementById('meeting-time').value = '';
+            }
+        });
     }
 });

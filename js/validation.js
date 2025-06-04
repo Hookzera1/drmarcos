@@ -131,12 +131,6 @@ function generateAppointmentCode() {
 function handleSubmit(event) {
     event.preventDefault();
     
-    if (isBlocked()) {
-        const timeLeft = blockEndTime - Date.now();
-        showMessage('error', `Você está temporariamente bloqueado. Tente novamente em ${formatBlockTime(timeLeft)}`);
-        return false;
-    }
-    
     const form = event.target;
     const nameInput = form.querySelector('#name');
     const emailInput = form.querySelector('#email');
@@ -150,64 +144,46 @@ function handleSubmit(event) {
     // Validar campos obrigatórios
     if (!nameInput.value.trim()) {
         showFieldError(nameInput, 'Nome é obrigatório');
-        attempts++;
-        checkAttempts();
         return false;
     }
     
     if (!emailInput.value.trim()) {
         showFieldError(emailInput, 'E-mail é obrigatório');
-        attempts++;
-        checkAttempts();
         return false;
     }
     
     if (!validateEmail(emailInput.value)) {
         showFieldError(emailInput, 'E-mail inválido');
-        attempts++;
-        checkAttempts();
         return false;
     }
     
     if (!phoneInput.value.trim()) {
         showFieldError(phoneInput, 'Telefone é obrigatório');
-        attempts++;
-        checkAttempts();
         return false;
     }
     
     if (!validatePhone(phoneInput.value)) {
         showFieldError(phoneInput, 'Telefone inválido');
-        attempts++;
-        checkAttempts();
         return false;
     }
     
     if (documentInput.value && !validateCPF(documentInput.value)) {
         showFieldError(documentInput, 'CPF inválido');
-        attempts++;
-        checkAttempts();
         return false;
     }
     
     if (!meetingTypeInput.value) {
         showFieldError(meetingTypeInput, 'Selecione o tipo de reunião');
-        attempts++;
-        checkAttempts();
         return false;
     }
     
     if (!meetingDateInput.value) {
         showMessage('error', 'Selecione uma data para a reunião');
-        attempts++;
-        checkAttempts();
         return false;
     }
     
     if (!meetingTimeInput.value) {
         showMessage('error', 'Selecione um horário para a reunião');
-        attempts++;
-        checkAttempts();
         return false;
     }
     
@@ -217,31 +193,34 @@ function handleSubmit(event) {
         return false;
     }
 
-    // Se chegou aqui, o formulário é válido
-    const appointmentData = {
-        code: generateAppointmentCode(),
-        name: nameInput.value,
-        email: emailInput.value,
-        phone: formatPhone(phoneInput.value),
-        document: documentInput.value ? formatCPF(documentInput.value) : '',
-        meetingType: meetingTypeInput.value,
-        meetingDate: meetingDateInput.value,
-        meetingTime: meetingTimeInput.value,
-        format: form.querySelector('input[name="format"]:checked').value,
-        notes: notesInput.value,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-    };
-    
     try {
-        // Salvar agendamento
-        saveAppointment(appointmentData);
-        
-        // Limpar tentativas após sucesso
-        attempts = 0;
-        
+        // Se chegou aqui, o formulário é válido
+        const appointmentData = {
+            code: generateAppointmentCode(),
+            name: nameInput.value,
+            email: emailInput.value,
+            phone: formatPhone(phoneInput.value),
+            document: documentInput.value ? formatCPF(documentInput.value) : '',
+            meetingType: meetingTypeInput.value,
+            meetingDate: meetingDateInput.value,
+            meetingTime: meetingTimeInput.value,
+            format: form.querySelector('input[name="format"]:checked').value,
+            notes: notesInput.value,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
+
         // Formatar data para exibição
         const formattedDate = new Date(appointmentData.meetingDate).toLocaleDateString('pt-BR');
+
+        // Preparar e enviar mensagem do WhatsApp antes de salvar
+        const whatsappMessage = `Olá Dr. Marcos! Gostaria de agendar uma consulta.\n\nNome: ${appointmentData.name}\nData: ${formattedDate}\nHorário: ${appointmentData.meetingTime}\nTipo: ${appointmentData.meetingType}\nFormato: ${appointmentData.format}${appointmentData.notes ? '\nObservações: ' + appointmentData.notes : ''}`;
+        
+        // Enviar mensagem no WhatsApp
+        openWhatsAppWithMessage(whatsappMessage);
+
+        // Salvar agendamento
+        saveAppointment(appointmentData);
         
         // Criar container para os detalhes se não existir
         let resultContainer = document.querySelector('#appointment-result');
@@ -283,9 +262,9 @@ function handleSubmit(event) {
                 <p>Em breve você receberá uma confirmação via WhatsApp.</p>
             </div>
             <div class="appointment-actions">
-                <a href="javascript:void(0)" onclick="openWhatsApp()" class="btn btn-whatsapp">
-                    <i class="fab fa-whatsapp"></i> Contatar via WhatsApp
-                </a>
+                <button type="button" class="btn btn-outline" onclick="resetNewAppointmentForm()">
+                    <i class="fas fa-plus"></i> Nova Consulta
+                </button>
             </div>
         `;
         
@@ -295,22 +274,44 @@ function handleSubmit(event) {
         // Esconder o formulário
         form.style.display = 'none';
         
-        // Enviar mensagem com detalhes do agendamento
-        const message = `Olá Dr. Marcos! Acabei de fazer um agendamento pelo site.\n\n` +
-            `Código: ${appointmentData.code}\n` +
-            `Nome: ${appointmentData.name}\n` +
-            `Data: ${formattedDate}\n` +
-            `Horário: ${appointmentData.meetingTime}\n` +
-            `Tipo: ${appointmentData.meetingType}\n` +
-            `Formato: ${appointmentData.format}`;
-            
-        openWhatsAppWithMessage(message);
-        
         return false;
     } catch (error) {
         console.error('Erro ao salvar agendamento:', error);
         showMessage('error', 'Ocorreu um erro ao salvar o agendamento. Por favor, tente novamente.');
         return false;
+    }
+}
+
+// Função para resetar o formulário de nova consulta
+function resetNewAppointmentForm() {
+    const form = document.querySelector('#scheduleForm');
+    const resultContainer = document.querySelector('#appointment-result');
+    
+    if (form) {
+        // Resetar campos do formulário
+        form.reset();
+        form.style.display = 'block';
+        
+        // Limpar seleções do calendário
+        const selectedDay = document.querySelector('.calendar-day.selected');
+        if (selectedDay) {
+            selectedDay.classList.remove('selected');
+        }
+        
+        // Resetar display de data
+        document.getElementById('selected-date').textContent = 'Nenhuma';
+        document.getElementById('meeting-date').value = '';
+        
+        // Limpar horários
+        const timeSlotsContainer = document.getElementById('time-slots');
+        if (timeSlotsContainer) {
+            timeSlotsContainer.innerHTML = '<p class="select-date-message">Selecione uma data para ver os horários disponíveis</p>';
+        }
+        document.getElementById('meeting-time').value = '';
+    }
+    
+    if (resultContainer) {
+        resultContainer.innerHTML = '';
     }
 }
 
@@ -425,12 +426,6 @@ function checkAppointment(event) {
             'approved': 'check',
             'cancelled': 'times'
         };
-
-        const statusColorMap = {
-            'pending': '#856404',
-            'approved': '#155724',
-            'cancelled': '#721c24'
-        };
         
         // Formatar data para exibição
         const formattedDate = new Date(appointment.meetingDate).toLocaleDateString('pt-BR');
@@ -473,9 +468,9 @@ function checkAppointment(event) {
                     <button type="button" class="btn btn-danger" onclick="handleCancelAppointment('${appointment.code}')">
                         <i class="fas fa-times"></i> Cancelar Agendamento
                     </button>
-                    <a href="javascript:void(0)" onclick="openWhatsApp()" class="btn btn-whatsapp">
+                    <button type="button" class="btn btn-whatsapp" onclick="openWhatsApp()">
                         <i class="fab fa-whatsapp"></i> Contatar via WhatsApp
-                    </a>
+                    </button>
                 </div>
             ` : `
                 <div class="appointment-cancelled-message">
@@ -508,49 +503,33 @@ function handleCancelAppointment(code) {
 
     if (confirm('Tem certeza que deseja cancelar este agendamento? Esta ação não pode ser desfeita.')) {
         try {
-            const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-            const appointmentIndex = appointments.findIndex(a => a.code === code);
-            
-            if (appointmentIndex === -1) {
-                showMessage('error', 'Agendamento não encontrado');
-                return;
-            }
-            
-            // Atualizar status e adicionar data de cancelamento
-            const appointment = appointments[appointmentIndex];
-            appointment.status = 'cancelled';
-            appointment.cancelledAt = new Date().toISOString();
-            appointments[appointmentIndex] = appointment;
-            
-            // Remover bloqueio do horário
-            removeBlockedTime(appointment.meetingDate, appointment.meetingTime);
-            
-            // Salvar alterações
-            localStorage.setItem('appointments', JSON.stringify(appointments));
-            
-            // Mostrar mensagem de sucesso com animação
-            const resultContainer = document.querySelector('#appointment-result');
-            if (resultContainer) {
-                const successMessage = document.createElement('div');
-                successMessage.className = 'cancellation-success';
-                successMessage.innerHTML = `
-                    <div class="cancellation-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <h4>Agendamento Cancelado</h4>
-                    <p>O agendamento foi cancelado com sucesso.</p>
-                    <button type="button" class="btn btn-outline" onclick="resetConsultaForm()">
-                        <i class="fas fa-search"></i> Consultar outro agendamento
-                    </button>
-                `;
-                
-                // Substituir conteúdo atual com animação
-                resultContainer.style.opacity = '0';
-                setTimeout(() => {
-                    resultContainer.innerHTML = '';
-                    resultContainer.appendChild(successMessage);
-                    resultContainer.style.opacity = '1';
-                }, 300);
+            if (cancelAppointment(code)) {
+                // Mostrar mensagem de sucesso com animação
+                const resultContainer = document.querySelector('#appointment-result');
+                if (resultContainer) {
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'cancellation-success';
+                    successMessage.innerHTML = `
+                        <div class="cancellation-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h4>Agendamento Cancelado</h4>
+                        <p>O agendamento foi cancelado com sucesso.</p>
+                        <button type="button" class="btn btn-outline" onclick="resetConsultaForm()">
+                            <i class="fas fa-search"></i> Consultar outro agendamento
+                        </button>
+                    `;
+                    
+                    // Substituir conteúdo atual com animação
+                    resultContainer.style.opacity = '0';
+                    setTimeout(() => {
+                        resultContainer.innerHTML = '';
+                        resultContainer.appendChild(successMessage);
+                        resultContainer.style.opacity = '1';
+                    }, 300);
+                }
+            } else {
+                showMessage('error', 'Não foi possível cancelar o agendamento. Tente novamente.');
             }
         } catch (error) {
             console.error('Erro ao cancelar agendamento:', error);
@@ -576,41 +555,35 @@ function resetConsultaForm() {
 
 // Função para abrir WhatsApp com mensagem
 function openWhatsAppWithMessage(message) {
+    const phone = '5531992180253';
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `whatsapp://send?phone=5531992180253&text=${encodedMessage}`;
-    const webWhatsappUrl = `https://wa.me/5531992180253?text=${encodedMessage}`;
     
-    // Criar um link temporário e clicar nele
-    const link = document.createElement('a');
-    link.href = whatsappUrl;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Verificar se é mobile ou desktop
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
-    // Se o app não abrir em 1 segundo, tentar versão web
-    setTimeout(() => {
-        window.location.href = webWhatsappUrl;
-    }, 1000);
+    if (isMobile) {
+        // URL para dispositivos móveis
+        window.location.href = `whatsapp://send?phone=${phone}&text=${encodedMessage}`;
+    } else {
+        // URL para desktop
+        window.open(`https://web.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`, '_blank');
+    }
 }
 
 // Função para abrir WhatsApp sem mensagem
 function openWhatsApp() {
-    const whatsappUrl = `whatsapp://send?phone=5531992180253`;
-    const webWhatsappUrl = `https://wa.me/5531992180253`;
+    const phone = '5531992180253';
     
-    // Criar um link temporário e clicar nele
-    const link = document.createElement('a');
-    link.href = whatsappUrl;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Verificar se é mobile ou desktop
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
-    // Se o app não abrir em 1 segundo, tentar versão web
-    setTimeout(() => {
-        window.location.href = webWhatsappUrl;
-    }, 1000);
+    if (isMobile) {
+        // URL para dispositivos móveis
+        window.location.href = `whatsapp://send?phone=${phone}`;
+    } else {
+        // URL para desktop
+        window.open(`https://web.whatsapp.com/send?phone=${phone}`, '_blank');
+    }
 }
 
 // Inicializar eventos
@@ -669,4 +642,4 @@ document.addEventListener('DOMContentLoaded', function() {
     if (checkForm) {
         checkForm.addEventListener('submit', checkAppointment);
     }
-}); 
+});

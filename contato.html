@@ -153,7 +153,7 @@
                 </div>
                 
                 <div class="tab-content" id="check-appointment">
-                    <form id="checkAppointmentForm">
+                    <form id="checkAppointmentForm" onsubmit="return checkAppointment(event)">
                         <div class="form-group">
                             <label for="check-email">E-mail utilizado no agendamento</label>
                             <input type="email" id="check-email" name="check-email" required>
@@ -167,6 +167,7 @@
                         </div>
                     </form>
                 </div>
+                <div id="appointment-result"></div>
             </div>
         </div>
     </section>
