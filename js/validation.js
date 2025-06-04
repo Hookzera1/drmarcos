@@ -283,7 +283,7 @@ function handleSubmit(event) {
                 <p>Em breve você receberá uma confirmação via WhatsApp.</p>
             </div>
             <div class="appointment-actions">
-                <a href="https://wa.me/5531992180253" target="_blank" class="btn btn-whatsapp">
+                <a href="whatsapp://send?phone=5531992180253" target="_blank" class="btn btn-whatsapp">
                     <i class="fab fa-whatsapp"></i> Contatar via WhatsApp
                 </a>
             </div>
@@ -306,7 +306,15 @@ function handleSubmit(event) {
             `Formato: ${appointmentData.format}`
         );
         
-        window.open(`https://wa.me/5531992180253?text=${whatsappMessage}`, '_blank');
+        // Tentar abrir no app primeiro, se falhar, abrir na web
+        try {
+            window.location.href = `whatsapp://send?phone=5531992180253&text=${whatsappMessage}`;
+            setTimeout(() => {
+                window.location.href = `https://wa.me/5531992180253?text=${whatsappMessage}`;
+            }, 500);
+        } catch (e) {
+            window.open(`https://wa.me/5531992180253?text=${whatsappMessage}`, '_blank');
+        }
         
         return false;
     } catch (error) {
@@ -475,7 +483,7 @@ function checkAppointment(event) {
                     <button type="button" class="btn btn-danger" onclick="handleCancelAppointment('${appointment.code}')">
                         <i class="fas fa-times"></i> Cancelar Agendamento
                     </button>
-                    <a href="https://wa.me/5531992180253" target="_blank" class="btn btn-whatsapp">
+                    <a href="whatsapp://send?phone=5531992180253" target="_blank" class="btn btn-whatsapp">
                         <i class="fab fa-whatsapp"></i> Contatar via WhatsApp
                     </a>
                 </div>
