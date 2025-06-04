@@ -283,7 +283,7 @@ function handleSubmit(event) {
                 <p>Em breve você receberá uma confirmação via WhatsApp.</p>
             </div>
             <div class="appointment-actions">
-                <a href="whatsapp://send?phone=5531992180253" target="_blank" class="btn btn-whatsapp">
+                <a href="javascript:void(0)" onclick="openWhatsApp()" class="btn btn-whatsapp">
                     <i class="fab fa-whatsapp"></i> Contatar via WhatsApp
                 </a>
             </div>
@@ -295,26 +295,16 @@ function handleSubmit(event) {
         // Esconder o formulário
         form.style.display = 'none';
         
-        // Redirecionar para WhatsApp
-        const whatsappMessage = encodeURIComponent(
-            `Olá Dr. Marcos! Acabei de fazer um agendamento pelo site.\n\n` +
+        // Enviar mensagem com detalhes do agendamento
+        const message = `Olá Dr. Marcos! Acabei de fazer um agendamento pelo site.\n\n` +
             `Código: ${appointmentData.code}\n` +
             `Nome: ${appointmentData.name}\n` +
             `Data: ${formattedDate}\n` +
             `Horário: ${appointmentData.meetingTime}\n` +
             `Tipo: ${appointmentData.meetingType}\n` +
-            `Formato: ${appointmentData.format}`
-        );
-        
-        // Tentar abrir no app primeiro, se falhar, abrir na web
-        try {
-            window.location.href = `whatsapp://send?phone=5531992180253&text=${whatsappMessage}`;
-            setTimeout(() => {
-                window.location.href = `https://wa.me/5531992180253?text=${whatsappMessage}`;
-            }, 500);
-        } catch (e) {
-            window.open(`https://wa.me/5531992180253?text=${whatsappMessage}`, '_blank');
-        }
+            `Formato: ${appointmentData.format}`;
+            
+        openWhatsAppWithMessage(message);
         
         return false;
     } catch (error) {
@@ -483,7 +473,7 @@ function checkAppointment(event) {
                     <button type="button" class="btn btn-danger" onclick="handleCancelAppointment('${appointment.code}')">
                         <i class="fas fa-times"></i> Cancelar Agendamento
                     </button>
-                    <a href="whatsapp://send?phone=5531992180253" target="_blank" class="btn btn-whatsapp">
+                    <a href="javascript:void(0)" onclick="openWhatsApp()" class="btn btn-whatsapp">
                         <i class="fab fa-whatsapp"></i> Contatar via WhatsApp
                     </a>
                 </div>
@@ -582,6 +572,45 @@ function resetConsultaForm() {
     if (resultContainer) {
         resultContainer.innerHTML = '';
     }
+}
+
+// Função para abrir WhatsApp com mensagem
+function openWhatsAppWithMessage(message) {
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `whatsapp://send?phone=5531992180253&text=${encodedMessage}`;
+    const webWhatsappUrl = `https://wa.me/5531992180253?text=${encodedMessage}`;
+    
+    // Criar um link temporário e clicar nele
+    const link = document.createElement('a');
+    link.href = whatsappUrl;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Se o app não abrir em 1 segundo, tentar versão web
+    setTimeout(() => {
+        window.location.href = webWhatsappUrl;
+    }, 1000);
+}
+
+// Função para abrir WhatsApp sem mensagem
+function openWhatsApp() {
+    const whatsappUrl = `whatsapp://send?phone=5531992180253`;
+    const webWhatsappUrl = `https://wa.me/5531992180253`;
+    
+    // Criar um link temporário e clicar nele
+    const link = document.createElement('a');
+    link.href = whatsappUrl;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Se o app não abrir em 1 segundo, tentar versão web
+    setTimeout(() => {
+        window.location.href = webWhatsappUrl;
+    }, 1000);
 }
 
 // Inicializar eventos
